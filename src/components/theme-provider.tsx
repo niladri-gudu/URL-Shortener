@@ -1,23 +1,37 @@
-"use client"; // Ensures this runs only on the client side
+"use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes";
 import { useEffect, useState } from "react";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+interface CustomThemeProviderProps extends Omit<ThemeProviderProps, "attribute"> {
+  attribute?: "class" | "data-theme";
+}
+
+export function ThemeProvider({
+  children,
+  attribute = "class",
+  defaultTheme = "system",
+  enableSystem = true,
+  disableTransitionOnChange = true,
+}: CustomThemeProviderProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true); // Ensures theme loads only on the client
+    setMounted(true);
   }, []);
 
   if (!mounted) {
-    return <>{children}</>; // Prevents hydration mismatch
+    return <>{children}</>;
   }
 
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system">
+    <NextThemesProvider
+      attribute={attribute}
+      defaultTheme={defaultTheme}
+      enableSystem={enableSystem}
+      disableTransitionOnChange={disableTransitionOnChange}
+    >
       {children}
     </NextThemesProvider>
   );
 }
-  
